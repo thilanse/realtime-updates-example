@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 import datetime
 import flask
-import redis
+from redis import Redis
 
 
 app = flask.Flask(__name__)
 app.secret_key = 'asdf'
-red = redis.StrictRedis()
+redis = Redis(host='redis', port=6379)
 
 
 def event_stream():
-    pubsub = red.pubsub()
+    pubsub = redis.pubsub()
     pubsub.subscribe('chat')
     # TODO: handle client disconnection.
     for message in pubsub.listen():
@@ -32,7 +32,7 @@ def post():
     message = flask.request.form['message']
     user = flask.session.get('user', 'anonymous')
     now = datetime.datetime.now().replace(microsecond=0).time()
-    red.publish('chat', u'[%s] %s: %s' % (now.isoformat(), user, message))
+    redis.publish('chat', u'[%s] %s: %s' % (now.isoformat(), user, message))
     return flask.Response(status=204)
 
 
@@ -75,6 +75,5 @@ def home():
     """ % flask.session['user']
 
 
-if __name__ == '__main__':
-    app.debug = True
-    app.run(threaded=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", debug=True, threaded=True)
