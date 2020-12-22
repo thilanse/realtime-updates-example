@@ -1,12 +1,18 @@
 version: '3'
-services: 
-  product-service:
-    build: ./server
-    ports:
-      - "5000:5000"
+services:
+  api:
+    build: ./api
     volumes:
-      - ./server:/app
+      - ./api:/app
+    ports:
+      - '5000:5000'
+  client:
+    stdin_open: true
+    build: ./client
+    volumes: 
+      - /app/node_modules
+      - ./client:/app
+    ports:
+      - '3000:3000'
     depends_on:
-      - redis
-  redis:
-    image: redis
+      - api
