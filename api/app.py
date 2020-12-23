@@ -13,31 +13,41 @@ socketIo = SocketIO(app, cors_allowed_origins="*")
 
 app.debug = True
 
-# app.host = 'localhost'
+
+def persist_to_db(data):
+    """
+    You can save the data to the db here.
+
+    :param data:
+    :return:
+    """
+    pass
 
 
 @app.route('/post', methods=['POST'])
 @cross_origin(origin="*")
 def post():
-
     # Read request body (Data from clusters)
     data = request.get_json()
 
     # Extract the required properties from the data
-
-    # Persist the data into the DB tables
-
-    # Emit latest datapoint as an Socket IO event
-
-    # Return Response
     message = data['message']
     temperature = random.randint(1, 150)
     data['measurements'] = {"temperature": temperature}
     current_time = datetime.now()
     app.logger.info("Current Time: " + str(current_time))
     data['time'] = current_time.timestamp()
+
+    # Persist the data into the DB tables
+    persist_to_db(data)
+
+    # Emit latest datapoint as an Socket IO event
     socketIo.emit("cluster_data", data)
+
+    # Log message
     app.logger.info("POST REQUEST: " + str(message))
+
+    # Return Response
     return jsonify(data)
 
 
