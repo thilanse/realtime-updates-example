@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import io from "socket.io-client";
 import TemperatureChart from "./charts/TemperatureChart";
 import axios from 'axios';
